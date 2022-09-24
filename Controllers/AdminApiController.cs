@@ -23,7 +23,7 @@ namespace FlightPlanner.Controllers
         [Microsoft.AspNetCore.Mvc.NonAction]
         public override Microsoft.AspNetCore.Mvc.BadRequestResult BadRequest()
         {
-            return new BadRequestResult();
+            return new BadRequestResult(); // toBe(400);
         }
 
         [Route("flights")]
