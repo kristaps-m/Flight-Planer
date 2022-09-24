@@ -18,7 +18,12 @@ namespace FlightPlanner
 
         public static Flight GetFlight(int id)
         {
-            return _flights.FirstOrDefault(f => f.Id == id);
+            if (id <= _flights.Count && id >= 0)
+            {
+                return _flights.FirstOrDefault(f => f.Id == id);
+            }
+
+            return null;
         }
 
         public static void Clear()
@@ -133,6 +138,25 @@ namespace FlightPlanner
 
             return listToReturn.ToArray();
         }
+        
+        // public static void FindFlight(int id)
+        // {
+        //     var flightListRange = _flights.Count;
+        //     var theFlightIndex = 0;
+        //
+        //     if (id <= flightListRange && id >= 0)
+        //     {
+        //         for (int i = 0; i < flightListRange; i++)
+        //         {
+        //             if (_flights[i].Id == id)
+        //             {
+        //                 theFlightIndex = i;
+        //             }
+        //         }
+        //     
+        //         _flights.RemoveAt(theFlightIndex);
+        //     }
+        // }
 
         private static string LowAndTrim(string word)
         {
