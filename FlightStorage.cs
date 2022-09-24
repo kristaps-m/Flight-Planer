@@ -109,6 +109,31 @@ namespace FlightPlanner
             return false;
         }
 
+        public static Airport[] SearchAirports(string phrase)
+        {
+            var listToReturn = new List<Airport>();
+            phrase = LowAndTrim(phrase);
+
+            foreach (Flight f in _flights)
+            {
+                if (LowAndTrim(f.To.Country).Contains(phrase) || 
+                    LowAndTrim(f.To.City).Contains(phrase) || 
+                    LowAndTrim(f.To.AirportCode).Contains(phrase))
+                {
+                    listToReturn.Add(f.To);
+                }
+                
+                if (LowAndTrim(f.From.Country).Contains(phrase) || 
+                    LowAndTrim(f.From.City).Contains(phrase) || 
+                    LowAndTrim(f.From.AirportCode).Contains(phrase))
+                {
+                    listToReturn.Add(f.From);
+                }
+            }
+
+            return listToReturn.ToArray();
+        }
+
         private static string LowAndTrim(string word)
         {
             return word.ToLower().Trim();
