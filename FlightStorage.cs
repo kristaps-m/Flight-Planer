@@ -16,6 +16,20 @@ namespace FlightPlanner
             return flight;
         }
 
+        public static PageResult FindFlightByRequest(SearchFlightsRequest req)
+        {
+            var Items = new List<Flight>();
+            foreach (var f in _flights)
+            {
+                if (req.From == f.From.AirportCode && req.To == f.To.AirportCode && req.DepartureDate == f.DepartureTime)
+                {
+                    Items.Add(f);
+                }
+            }
+
+            return new PageResult(Items.Count, Items.ToArray());
+        }
+
         public static Flight GetFlight(int id)
         {
             if (id <= _flights.Count && id >= 0)

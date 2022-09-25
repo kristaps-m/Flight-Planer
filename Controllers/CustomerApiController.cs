@@ -18,11 +18,9 @@ namespace FlightPlanner.Controllers
 
         // Search Airport   // public FIND FLIGHTS ?
         [Route("flights/search")]
-        [HttpGet]
+        [HttpPost]
         public IActionResult FindFlight(SearchFlightsRequest req)
         {
-            //var airports = FlightStorage.SearchAirports(req);
-            Console.WriteLine(req + "<--------- req");
             if (IsItBadRequest(req))
             {
                 return BadRequest();
@@ -33,14 +31,9 @@ namespace FlightPlanner.Controllers
                 return BadRequest();
             }
 
-            var test = new PageResult
-            {
-                Page = 0,
-                TotalItems = 0,
-                Items = Array.Empty<Flight>()
-            };
+            var pageResult = FlightStorage.FindFlightByRequest(req);
 
-            return Ok(test);
+            return Ok(pageResult);
         }
         
         // Find Flight by ID
