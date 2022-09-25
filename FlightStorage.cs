@@ -8,11 +8,16 @@ namespace FlightPlanner
     {
         private static List<Flight> _flights = new List<Flight>();
         private static int _id = 0;
+        private static readonly object balanceLock = new object();
 
         public static Flight AddFlight(Flight flight)
         {
             flight.Id = ++_id;
             _flights.Add(flight);
+            // lock (balanceLock)  // LOCK-----------------------------
+            // {
+            //     
+            // }
             return flight;
         }
 
@@ -60,28 +65,37 @@ namespace FlightPlanner
                         theFlightIndex = i;
                     }
                 }
-            
+
                 _flights.RemoveAt(theFlightIndex);
+                // lock (balanceLock) // LOCK-----------------------------
+                // {
+                //     
+                // }
             }
         }
 
         public static bool IsThereSameFlightInStorage(Flight flight)
         {
-            foreach (var f in _flights)
+            lock (balanceLock)
             {
-                if (LowAndTrim(flight.ArrivalTime) == LowAndTrim(f.ArrivalTime) &&
-                    LowAndTrim(flight.DepartureTime) == LowAndTrim(f.DepartureTime) &&
-                    LowAndTrim(flight.From.City) == LowAndTrim(f.From.City) &&
-                    LowAndTrim(flight.From.AirportCode) == LowAndTrim(f.From.AirportCode) &&
-                    LowAndTrim(flight.From.Country) == LowAndTrim(f.From.Country) &&
-                    LowAndTrim(flight.Carrier) == LowAndTrim(f.Carrier) &&
-                    LowAndTrim(flight.To.City) == LowAndTrim(f.To.City) &&
-                    LowAndTrim(flight.To.AirportCode) == LowAndTrim(f.To.AirportCode) &&
-                    LowAndTrim(flight.To.Country) == LowAndTrim(f.To.Country))
+                foreach (var f in _flights)
                 {
-                    return true;
+                    if (LowAndTrim(flight.ArrivalTime) == LowAndTrim(f.ArrivalTime) &&
+                        LowAndTrim(flight.DepartureTime) == LowAndTrim(f.DepartureTime) &&
+                        LowAndTrim(flight.From.City) == LowAndTrim(f.From.City) &&
+                        LowAndTrim(flight.From.AirportCode) == LowAndTrim(f.From.AirportCode) &&
+                        LowAndTrim(flight.From.Country) == LowAndTrim(f.From.Country) &&
+                        LowAndTrim(flight.Carrier) == LowAndTrim(f.Carrier) &&
+                        LowAndTrim(flight.To.City) == LowAndTrim(f.To.City) &&
+                        LowAndTrim(flight.To.AirportCode) == LowAndTrim(f.To.AirportCode) &&
+                        LowAndTrim(flight.To.Country) == LowAndTrim(f.To.Country))
+                    {
+                        return true;
+                    }
                 }
             }
+            
+
 
             return false;
         }

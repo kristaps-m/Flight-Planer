@@ -8,12 +8,16 @@ namespace FlightPlanner.Controllers
     [ApiController]
     public class CustomerApiController : ControllerBase
     {
+        private readonly object balanceLock = new object();
         // Search Airport // should search by incomplete phrases
         [Route("airports")]
         [HttpGet]
         public IActionResult SearchAirports(string search)
         {
-            return Ok(FlightStorage.SearchAirports(search)); // This one works
+            lock (balanceLock)
+            {
+                return Ok(FlightStorage.SearchAirports(search)); // This one works
+            }
         }
 
         // Search Airport   // public FIND FLIGHTS ?
@@ -31,9 +35,11 @@ namespace FlightPlanner.Controllers
                 return BadRequest();
             }
 
-            var pageResult = FlightStorage.FindFlightByRequest(req);
-
-            return Ok(pageResult);
+            lock (balanceLock)
+            {
+                var pageResult = FlightStorage.FindFlightByRequest(req);
+                return Ok(pageResult);
+            }
         }
         
         // Find Flight by ID

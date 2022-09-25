@@ -7,6 +7,8 @@ namespace FlightPlanner.Controllers
     [ApiController,Authorize]
     public class AdminApiController : ControllerBase
     {
+        private readonly object balanceLock = new object();
+        
         [Route("flights/{id}")]
         [HttpGet]
         public IActionResult GetFlight(int id)
@@ -55,8 +57,12 @@ namespace FlightPlanner.Controllers
             {
                 return BadRequest();
             }
+            lock (balanceLock)
+            {
+                flight = FlightStorage.AddFlight(flight);
+            }
             
-            flight = FlightStorage.AddFlight(flight);
+            //flight = FlightStorage.AddFlight(flight);
             return Created("",flight);
         }
 
@@ -64,7 +70,11 @@ namespace FlightPlanner.Controllers
         [HttpDelete]
         public IActionResult DeleteFlight(int id)
         {
-            FlightStorage.Delete(id);
+            lock (balanceLock)
+            {
+                FlightStorage.Delete(id);
+            }
+            //FlightStorage.Delete(id);
             return Ok();
         }
     }
