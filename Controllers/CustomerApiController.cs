@@ -1,3 +1,4 @@
+using System;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,16 +19,28 @@ namespace FlightPlanner.Controllers
         // Search Airport   // public FIND FLIGHTS ?
         [Route("flights/search")]
         [HttpGet]
-        public IActionResult FindFlight(Flight request)
+        public IActionResult FindFlight(SearchFlightsRequest req)
         {
             //var airports = FlightStorage.SearchAirports(req);
-            if (IsItBadRequest(request))
+            Console.WriteLine(req + "<--------- req");
+            if (IsItBadRequest(req))
+            {
+                return BadRequest();
+            }
+            
+            if (req.From == req.To)
             {
                 return BadRequest();
             }
 
-            var flight = FlightStorage.GetFlight(request.Id);
-            return Ok(flight);
+            var test = new PageResult
+            {
+                Page = 0,
+                TotalItems = 0,
+                Items = Array.Empty<Flight>()
+            };
+
+            return Ok(test);
         }
         
         // Find Flight by ID
@@ -49,9 +62,9 @@ namespace FlightPlanner.Controllers
             return new BadRequestResult(); // toBe(400);
         }
 
-        private static bool IsItBadRequest(Flight flight)
+        private static bool IsItBadRequest(SearchFlightsRequest req)
         {
-            return flight.From == null || flight.To == null || flight.DepartureTime == null;
+            return req.From == null || req.To == null || req.DepartureDate == null;
         }
     }
 }
