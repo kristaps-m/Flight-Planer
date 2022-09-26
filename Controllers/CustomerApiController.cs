@@ -8,16 +8,19 @@ namespace FlightPlanner.Controllers
     [ApiController]
     public class CustomerApiController : ControllerBase
     {
-        private readonly object balanceLock = new object();
+        private static readonly object balanceLock = new object();
         // Search Airport // should search by incomplete phrases
         [Route("airports")]
         [HttpGet]
         public IActionResult SearchAirports(string search)
         {
-            lock (balanceLock)
-            {
-                return Ok(FlightStorage.SearchAirports(search)); // This one works
-            }
+            // LOCK vissu kas saistitis ar listu
+            // lock (balanceLock)
+            // {
+            //     return Ok(FlightStorage.SearchAirports(search)); // This one works
+            // }
+            
+            return Ok(FlightStorage.SearchAirports(search)); // This one works
         }
 
         // Search Airport   // public FIND FLIGHTS ?
@@ -35,11 +38,14 @@ namespace FlightPlanner.Controllers
                 return BadRequest();
             }
 
-            lock (balanceLock)
-            {
-                var pageResult = FlightStorage.FindFlightByRequest(req);
-                return Ok(pageResult);
-            }
+            // lock (balanceLock)
+            // {
+            //     var pageResult = FlightStorage.FindFlightByRequest(req);
+            //     return Ok(pageResult);
+            // }
+            
+            var pageResult = FlightStorage.FindFlightByRequest(req);
+            return Ok(pageResult);
         }
         
         // Find Flight by ID
@@ -47,11 +53,23 @@ namespace FlightPlanner.Controllers
         [HttpGet]
         public IActionResult FindFlightById(int id)
         {
+            // lock (balanceLock)
+            // {
+            //     var flight = FlightStorage.GetFlight(id);
+            //     if (flight == null)
+            //     {
+            //         return NotFound(); // Nr 3-should not find anything when non existing flight id passed
+            //     }
+            //     
+            //     return Ok(flight); // Nr 2-should be able to find flight by id
+            // }
+            
             var flight = FlightStorage.GetFlight(id);
             if (flight == null)
             {
                 return NotFound(); // Nr 3-should not find anything when non existing flight id passed
             }
+                
             return Ok(flight); // Nr 2-should be able to find flight by id
         }
         

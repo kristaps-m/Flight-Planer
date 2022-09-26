@@ -7,13 +7,24 @@ namespace FlightPlanner.Controllers
     [ApiController,Authorize]
     public class AdminApiController : ControllerBase
     {
-        private readonly object balanceLock = new object();
+        private static readonly object balanceLock = new object();
         
         [Route("flights/{id}")]
         [HttpGet]
         public IActionResult GetFlight(int id)
         {
+            // lock (balanceLock)
+            // {
+            //     var flight = FlightStorage.GetFlight(id);
+            //     
+            //     if (flight == null)
+            //     {
+            //         return NotFound();
+            //     }
+            // }
+            
             var flight = FlightStorage.GetFlight(id);
+                
             if (flight == null)
             {
                 return NotFound();
@@ -32,11 +43,6 @@ namespace FlightPlanner.Controllers
         [HttpPut]
         public IActionResult PutFlight(Flight flight)
         {
-            // Convflict. buus ja same flight add to list ?!
-            // check if we have same flight inside list ?
-            // jaapaarbauda visi properties :)
-            // var TEST = FlightStorage.GetFlight(flight.Id);
-      
             if (FlightStorage.IsThereSameFlightInStorage(flight))
             {
                 return Conflict();
@@ -57,10 +63,32 @@ namespace FlightPlanner.Controllers
             {
                 return BadRequest();
             }
-            lock (balanceLock)
-            {
-                flight = FlightStorage.AddFlight(flight);
-            }
+            flight = FlightStorage.AddFlight(flight);
+            
+            // lock (balanceLock)
+            // {
+            //     if (FlightStorage.IsThereSameFlightInStorage(flight))
+            //     {
+            //         return Conflict();
+            //     }
+            //
+            //     if (FlightStorage.DoesFlightHaveWrongValues(flight))
+            //     {
+            //         //Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState);
+            //         return BadRequest();
+            //     }
+            //
+            //     if (FlightStorage.DoesFlightHaveSameAirport(flight))
+            //     {
+            //         return BadRequest(); 
+            //     }
+            //
+            //     if (FlightStorage.DoesPlaneTakeOfAndLandOnRightTime(flight))
+            //     {
+            //         return BadRequest();
+            //     }
+            //     flight = FlightStorage.AddFlight(flight);
+            // }
             
             //flight = FlightStorage.AddFlight(flight);
             return Created("",flight);
@@ -70,11 +98,11 @@ namespace FlightPlanner.Controllers
         [HttpDelete]
         public IActionResult DeleteFlight(int id)
         {
-            lock (balanceLock)
-            {
-                FlightStorage.Delete(id);
-            }
-            //FlightStorage.Delete(id);
+            // lock (balanceLock)
+            // {
+            //     FlightStorage.Delete(id);
+            // }
+            FlightStorage.Delete(id);
             return Ok();
         }
     }
