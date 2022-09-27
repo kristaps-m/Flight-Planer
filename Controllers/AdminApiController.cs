@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using FlightPlanner.Validate;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FlightPlanner.Controllers
@@ -36,17 +37,17 @@ namespace FlightPlanner.Controllers
                 return Conflict();
             }
 
-            if (FlightStorage.DoesFlightHaveWrongValues(flight))
+            if (ValidateClass.DoesFlightHaveWrongValues(flight))
             {
                 return BadRequest();
             }
 
-            if (FlightStorage.DoesFlightHaveSameAirport(flight))
+            if (ValidateClass.DoesFlightHaveSameAirport(flight))
             {
                 return BadRequest(); 
             }
 
-            if (FlightStorage.DoesPlaneTakeOfAndLandOnRightTime(flight))
+            if (ValidateClass.DoesPlaneTakeOfAndLandOnRightTime(flight))
             {
                 return BadRequest();
             }

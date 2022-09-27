@@ -12,7 +12,7 @@ namespace FlightPlanner.Controllers
         [HttpGet]
         public IActionResult SearchAirports(string search)
         {
-            return Ok(FlightStorage.SearchAirports(search)); // This one works
+            return Ok(FlightStorage.SearchAirports(search));
         }
 
         [Route("flights/search")]
