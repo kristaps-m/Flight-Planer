@@ -660,3 +660,7 @@ fabric.properties
 # Additional files built by Visual Studio
 
 # End of https://www.toptal.com/developers/gitignore/api/csharp,visualstudio,rider
+/.idea/.idea.FlightPlanner.dir/.idea/.gitignore
+/.idea/.idea.FlightPlanner.dir/.idea/.name
+/.idea/.idea.FlightPlanner.dir/.idea/indexLayout.xml
+/.idea/.idea.FlightPlanner.dir/.idea/vcs.xml

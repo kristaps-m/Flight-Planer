@@ -8,16 +8,11 @@ namespace FlightPlanner
     {
         private static List<Flight> _flights = new List<Flight>();
         private static int _id = 0;
-        private static readonly object balanceLock = new object();
+        private static readonly object ObjectLock = new object();
 
         public static Flight AddFlight(Flight flight)
         {
-            // shiet liekam visus lokus kas saistiits ar listiem.
-            // if bad request 
-            // pietiek tikai ar kodu. Lidostaa...
-            // flight.Id = ++_id;
-            // _flights.Add(flight);
-            lock (balanceLock)  // LOCK-----------------------------
+            lock (ObjectLock)
             {
                 flight.Id = ++_id;
                 _flights.Add(flight);
@@ -28,40 +23,30 @@ namespace FlightPlanner
         public static PageResult FindFlightByRequest(SearchFlightsRequest req)
         {
             var Items = new List<Flight>();
-            lock (balanceLock)
+            lock (ObjectLock)
             {
                 foreach (var f in _flights)
                 {
-                    if (req.From == f.From.AirportCode && req.To == f.To.AirportCode && req.DepartureDate == f.DepartureTime)
+                    if (req.From == f.From.AirportCode && req.To == f.To.AirportCode &&
+                        req.DepartureDate == f.DepartureTime.Substring(0,10))
                     {
                         Items.Add(f);
                     }
                 }
             }
-            // foreach (var f in _flights)
-            // {
-            //     if (req.From == f.From.AirportCode && req.To == f.To.AirportCode && req.DepartureDate == f.DepartureTime)
-            //     {
-            //         Items.Add(f);
-            //     }
-            // }
-
+            
             return new PageResult(Items.Count, Items.ToArray());
         }
 
         public static Flight GetFlight(int id)
         {
-            lock (balanceLock)
+            lock (ObjectLock)
             {
                 if (id <= _flights.Count && id >= 0)
                 {
                     return _flights.FirstOrDefault(f => f.Id == id);
                 }
             }
-            // if (id <= _flights.Count && id >= 0)
-            // {
-            //     return _flights.FirstOrDefault(f => f.Id == id);
-            // }
 
             return null;
         }
@@ -74,7 +59,7 @@ namespace FlightPlanner
 
         public static void Delete(int id)
         {
-            lock (balanceLock)
+            lock (ObjectLock)
             {
                 var flightListRange = _flights.Count;
                 var theFlightIndex = 0;
@@ -92,27 +77,11 @@ namespace FlightPlanner
                     _flights.RemoveAt(theFlightIndex);
                 }
             }
-            
-            // var flightListRange = _flights.Count;
-            // var theFlightIndex = 0;
-            //
-            // if (id <= flightListRange && id >= 0)
-            // {
-            //     for (int i = 0; i < flightListRange; i++)
-            //     {
-            //         if (_flights[i].Id == id)
-            //         {
-            //             theFlightIndex = i;
-            //         }
-            //     }
-            //
-            //     _flights.RemoveAt(theFlightIndex);
-            // }
         }
 
         public static bool IsThereSameFlightInStorage(Flight flight)
         {
-            lock (balanceLock)
+            lock (ObjectLock)
             {
                 foreach (var f in _flights)
                 {
@@ -180,7 +149,7 @@ namespace FlightPlanner
             var listToReturn = new List<Airport>();
             phrase = LowAndTrim(phrase);
 
-            lock (balanceLock)
+            lock (ObjectLock)
             {
                 foreach (Flight f in _flights)
                 {
@@ -199,44 +168,9 @@ namespace FlightPlanner
                     }
                 }
             }
-            // foreach (Flight f in _flights)
-            // {
-            //     if (LowAndTrim(f.To.Country).Contains(phrase) || 
-            //         LowAndTrim(f.To.City).Contains(phrase) || 
-            //         LowAndTrim(f.To.AirportCode).Contains(phrase))
-            //     {
-            //         listToReturn.Add(f.To);
-            //     }
-            //     
-            //     if (LowAndTrim(f.From.Country).Contains(phrase) || 
-            //         LowAndTrim(f.From.City).Contains(phrase) || 
-            //         LowAndTrim(f.From.AirportCode).Contains(phrase))
-            //     {
-            //         listToReturn.Add(f.From);
-            //     }
-            // }
 
             return listToReturn.ToArray();
         }
-        
-        // public static void FindFlight(int id)
-        // {
-        //     var flightListRange = _flights.Count;
-        //     var theFlightIndex = 0;
-        //
-        //     if (id <= flightListRange && id >= 0)
-        //     {
-        //         for (int i = 0; i < flightListRange; i++)
-        //         {
-        //             if (_flights[i].Id == id)
-        //             {
-        //                 theFlightIndex = i;
-        //             }
-        //         }
-        //     
-        //         _flights.RemoveAt(theFlightIndex);
-        //     }
-        // }
 
         private static string LowAndTrim(string word)
         {
